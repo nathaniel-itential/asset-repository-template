@@ -62,7 +62,7 @@ class AssetDeployer:
         Returns:
             Dictionary mapping asset types to list of file paths
         """
-        repo_root = Path(__file__).parent.parent.parent
+        repo_root = Path.cwd()
         assets: dict[str, list[Path]] = {
             "projects": [],
             "automations": [],

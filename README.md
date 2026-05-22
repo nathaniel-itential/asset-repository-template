@@ -2,17 +2,19 @@
 
 A template repository that demonstrates how to manage Itential Platform assets using Git and automatic promotion through CI/CD pipelines. Use this as a starting point to version-control your asset bundles and automate deployments across environments.
 
-> **Currently supported:** GitHub Actions
+> **Currently supported:** GitHub Actions, GitLab CI/CD
 >
-> **Coming soon:** Bitbucket Pipelines, GitLab CI/CD, Jenkins
+> **Coming soon:** Bitbucket Pipelines, Jenkins
 
 ## How It Works
 
 This repository uses a tag-based promotion model. CI/CD pipelines execute the shared scripts in `pipelines/scripts/` to automatically version, tag, and deploy assets across environments.
 
+> **Note:** Throughout this documentation, `main` is used as the default branch name. If your repository uses `master`, substitute `master` wherever `main` appears.
+
 ```text
- develop branch           main branch              Staging                Production
- ──────────────           ───────────              ───────                ──────────
+ develop branch       main/master branch           Staging                Production
+ ──────────────       ──────────────────           ───────                ──────────
        |                       |                      |                       |
    commit work                 |                      |                       |
        |                       |                      |                       |
@@ -68,6 +70,7 @@ Once the version is determined, the script creates a release candidate tag (e.g.
 │
 ├── pipelines/
 │   ├── github/                # GitHub Actions pipeline definitions
+│   ├── gitlab/                # GitLab CI/CD pipeline definitions
 │   ├── scripts/               # Shared deployment scripts
 │   │   ├── deploy.py
 │   │   └── bump-version.sh
@@ -103,8 +106,8 @@ Each platform directory contains workflow/pipeline definitions and a README with
 | Directory | Platform | Status |
 | --- | --- | --- |
 | [`pipelines/github/`](pipelines/github) | GitHub Actions | Available |
+| [`pipelines/gitlab/`](pipelines/gitlab) | GitLab CI/CD | Available |
 | `pipelines/bitbucket/` | Bitbucket Pipelines | Coming soon |
-| `pipelines/gitlab/` | GitLab CI/CD | Coming soon |
 | `pipelines/jenkins/` | Jenkins | Coming soon |
 
 See the README in each platform directory for setup and deployment instructions.
