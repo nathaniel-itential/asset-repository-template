@@ -46,7 +46,7 @@ jobs:
 
             # Check if any changed files are actual asset files
             if echo "$CHANGED" | jq -r '.[]' \
-              | grep -qE "(Projects|Automations|LCM Resource Models|Golden Configurations)/.*\.json$"; then
+              | grep -qE "(studio|operations_manager|lifecycle_manager|configuration_manager)/.*\.json$"; then
               echo "has_changes=true" >> "$GITHUB_OUTPUT"
             else
               echo "No asset changes detected — skipping"
@@ -106,7 +106,7 @@ jobs:
 
             # Check if any changed files are actual asset files
             if echo "$CHANGED" | jq -r '.[]' \
-              | grep -qE "(Projects|Automations|LCM Resource Models|Golden Configurations)/.*\.json$"; then
+              | grep -qE "(studio|operations_manager|lifecycle_manager|configuration_manager)/.*\.json$"; then
               echo "has_changes=true" >> "$GITHUB_OUTPUT"
             else
               echo "No asset changes detected — skipping"
