@@ -23,7 +23,18 @@ Triggers on any tag push matching `v*`. The tag determines the target environmen
 | Contains `-rc` | `v1.1.0-rc.1` | Staging |
 | No `-rc` suffix | `v1.1.0` | Production |
 
-The workflow runs `.github/scripts/deploy.py` which connects to the target Itential Platform instance and imports all discovered assets.
+Diffs changed files against the previous tag and only deploys assets that were added or modified. The configurable `ASSET_DIRS` env var controls which directories are scanned (default: `studio|operations_manager|lifecycle_manager|configuration_manager`). Changed files are passed to `.github/scripts/deploy.py` as a JSON array.
+
+### Integration Deployment (`deploy-integrations.yml`)
+
+Triggers on any tag push matching `v*`, independently of the asset promotion workflow.
+
+| Tag pattern | Example | Target environment |
+| --- | --- | --- |
+| Contains `-rc` | `v1.1.0-rc.1` | Staging |
+| No `-rc` suffix | `v1.1.0` | Production |
+
+Diffs OpenAPI spec files in `integration_models/` against the previous tag and imports only changed specs using `ipctl` via `.github/scripts/deploy_integrations.sh`. The configurable `INTEGRATION_MODELS_DIR` env var controls which directory is scanned (default: `integration_models`).
 
 ## Setup
 
@@ -38,7 +49,7 @@ The workflow runs `.github/scripts/deploy.py` which connects to the target Itent
 Copy the workflow files from this directory into your repository's `.github/workflows/` directory, and copy the shared scripts from `pipelines/scripts/` into `.github/scripts/`:
 
 ```bash
-mkdir -p <path-to-your-repo>/.github/workflows <path-to-your-repo>.github/scripts
+mkdir -p <path-to-your-repo>/.github/workflows <path-to-your-repo>/.github/scripts
 cp pipelines/github/*.yml <path-to-your-repo>/.github/workflows/
 cp pipelines/scripts/* <path-to-your-repo>/.github/scripts/
 ```

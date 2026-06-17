@@ -66,13 +66,15 @@ Once the version is determined, the script creates a release candidate tag (e.g.
 │   ├── studio/
 │   ├── operations_manager/
 │   ├── lifecycle_manager/
-│   └── configuration_manager/
+│   ├── configuration_manager/
+│   └── integration_models/
 │
 ├── pipelines/
 │   ├── github/                # GitHub Actions pipeline definitions
 │   ├── gitlab/                # GitLab CI/CD pipeline definitions
 │   ├── scripts/               # Shared deployment scripts
 │   │   ├── deploy.py
+│   │   ├── deploy_integrations.sh
 │   │   └── bump-version.sh
 │   └── ...                    # Future Git platform directories
 │
@@ -87,6 +89,7 @@ An example asset bundle that shows the expected directory layout. It includes sa
 - **`operations_manager/`** — Operations Manager automation files (`.automation.json`)
 - **`lifecycle_manager/`** — Lifecycle Manager resource model files (`.model.json`)
 - **`configuration_manager/`** — Configuration Manager golden config files (`.gctree.json`)
+- **`integration_models/`** — OpenAPI spec files for Itential integration models (`.json`)
 
 You can add multiple bundles at the repo root and the deploy script will auto-discover them.
 
@@ -96,7 +99,8 @@ Contains CI/CD pipeline definitions organized by platform, along with shared scr
 
 **`pipelines/scripts/`** — Shared scripts used across all platforms:
 
-- **`deploy.py`** — Connects to an Itential Platform instance and imports all discovered assets from the repository. Currently supports Studio projects and Operations Manager automations. Support for Lifecycle Manager and Configuration Manager assets is coming soon.
+- **`deploy.py`** — Connects to an Itential Platform instance and imports all discovered assets from the repository. Supports Studio projects, Operations Manager automations, Lifecycle Manager resources, and Configuration Manager golden configs.
+- **`deploy_integrations.sh`** — Imports OpenAPI specs as integration models using `ipctl`. Reads a JSON array of spec paths from the `CHANGED_SPECS` environment variable.
 - **`bump-version.sh`** — Calculates the next semantic version based on commit messages and creates release candidate tags
 
 **Platform-specific pipeline directories:**
@@ -126,8 +130,10 @@ My Use Case Bundle/
 │   └── My Automation.automation.json
 ├── lifecycle_manager/               
 │   └── My Resource.model.json
-└── configuration_manager/           
-    └── My Config.gctree.json
+├── configuration_manager/           
+│   └── My Config.gctree.json
+└── integration_models/
+    └── My Integration.json
 ```
 
 The deploy script auto-discovers any bundles matching this structure. No additional configuration is needed.
