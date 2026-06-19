@@ -100,8 +100,7 @@ Contains CI/CD pipeline definitions organized by platform, along with shared scr
 **`pipelines/scripts/`** — Shared scripts used across all platforms:
 
 - **`deploy.py`** — Connects to an Itential Platform instance and imports all discovered assets from the repository. Supports Studio projects, Operations Manager automations, Lifecycle Manager resources, and Configuration Manager golden configs.
-- **`deploy_integrations.sh`** — Imports OpenAPI specs as integration models using `ipctl`. Reads a JSON array of spec paths from the `CHANGED_SPECS` environment variable.
-- **`bump-version.sh`** — Calculates the next semantic version based on commit messages and creates release candidate tags
+- **`deploy_integrations.sh`** — Imports OpenAPI specs as integration models using `ipctl`.
 
 **Platform-specific pipeline directories:**
 
