@@ -1,0 +1,52 @@
+image: python:3.11
+
+definitions:
+  steps:
+    - step: &create-rc-tag
+        name: Create RC Tag
+        image: alpine:latest
+        clone:
+          depth: full
+        script:
+          - apk add --no-cache bash git
+          - git fetch --tags --force
+          - git config user.name "bitbucket-pipelines[bot]"
+          - git config user.email "bitbucket-pipelines[bot]@noreply.bitbucket.org"
+          # BB_AUTH_STRING must be a Repository Access Token with write_repository scope,
+          # stored as a protected repository variable.
+          - git remote set-url origin "https://x-token-auth:${BB_AUTH_STRING}@bitbucket.org/${BITBUCKET_REPO_FULL_NAME}.git"
+          - bash scripts/bump-version.sh
+
+    - step: &deploy-staging
+        name: Deploy to Staging
+        deployment: Staging
+        script:
+          - pip install git+https://github.com/Itential/asyncplatform.git
+          - export HOST=$PLATFORM_HOST CLIENT_ID=$PLATFORM_CLIENT_ID CLIENT_SECRET=$PLATFORM_CLIENT_SECRET
+          - python scripts/deploy.py Staging
+
+pipelines:
+  # Triggers on any push to master (after a PR is merged).
+  # Creates an RC tag then immediately deploys to staging in the same pipeline run.
+  branches:
+    master:
+      - step: *create-rc-tag
+      - step: *deploy-staging
+
+  # Referenced only by the tag-push trigger below
+  custom:
+    deploy-production:
+      - step:
+          name: Deploy to Production
+          deployment: Production
+          script:
+            - pip install git+https://github.com/Itential/asyncplatform.git
+            - export HOST=$PLATFORM_HOST CLIENT_ID=$PLATFORM_CLIENT_ID CLIENT_SECRET=$PLATFORM_CLIENT_SECRET
+            - python scripts/deploy.py Production
+
+# RC tags (v*-rc*) are internal artifacts and must not trigger a production deploy pipeline at all.
+triggers:
+  repository-push:
+    - condition: glob(BITBUCKET_TAG, "v*") && !glob(BITBUCKET_TAG, "*-rc*")
+      pipelines:
+        - deploy-production

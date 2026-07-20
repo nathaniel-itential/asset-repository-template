@@ -2,9 +2,9 @@
 
 A template repository that demonstrates how to manage Itential Platform assets using Git and automatic promotion through CI/CD pipelines. Use this as a starting point to version-control your asset bundles and automate deployments across environments.
 
-> **Currently supported:** GitHub Actions, GitLab CI/CD
+> **Currently supported:** GitHub Actions, GitLab CI/CD, Bitbucket Pipelines
 >
-> **Coming soon:** Bitbucket Pipelines, Jenkins
+> **Coming soon:** Jenkins
 
 ## How It Works
 
@@ -71,6 +71,7 @@ Once the version is determined, the script creates a release candidate tag (e.g.
 ├── pipelines/
 │   ├── github/                # GitHub Actions pipeline definitions
 │   ├── gitlab/                # GitLab CI/CD pipeline definitions
+│   ├── bitbucket/             # Bitbucket Pipelines definitions
 │   ├── scripts/               # Shared deployment scripts
 │   │   ├── deploy.py
 │   │   └── bump-version.sh
@@ -107,7 +108,7 @@ Each platform directory contains workflow/pipeline definitions and a README with
 | --- | --- | --- |
 | [`pipelines/github/`](pipelines/github) | GitHub Actions | Available |
 | [`pipelines/gitlab/`](pipelines/gitlab) | GitLab CI/CD | Available |
-| `pipelines/bitbucket/` | Bitbucket Pipelines | Coming soon |
+| [`pipelines/bitbucket/`](pipelines/bitbucket) | Bitbucket Pipelines | Available |
 | `pipelines/jenkins/` | Jenkins | Coming soon |
 
 See the README in each platform directory for setup and deployment instructions.
