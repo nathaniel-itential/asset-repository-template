@@ -265,7 +265,7 @@ class AssetDeployer:
                 print(f"✅ Successfully imported golden config: {config_name}")
             except Exception as e:
                 print(f"❌ Failed to import golden config {config_name}: {e}")
-                print(f"⚠️  Skipping {config_name} and continuing deployment")
+                raise
     
 
     async def deploy(self) -> None:
