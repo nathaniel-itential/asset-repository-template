@@ -97,7 +97,7 @@ Contains CI/CD pipeline definitions organized by platform, along with shared scr
 
 **`pipelines/scripts/`** — Shared scripts used across all platforms:
 
-- **`deploy.py`** — Connects to an Itential Platform instance and imports all discovered assets from the repository. Currently supports Studio projects and Operations Manager automations. Support for Lifecycle Manager and Configuration Manager assets is coming soon.
+- **`deploy.py`** — Connects to an Itential Platform instance and imports all discovered assets from the repository. Currently supports Studio projects, Operations Manager automations, Golden configurations, and Lifecycle Manager resources
 - **`bump-version.sh`** — Calculates the next semantic version based on commit messages and creates release candidate tags
 
 **Platform-specific pipeline directories:**
