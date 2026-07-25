@@ -8,10 +8,8 @@ the target Itential Platform environment using the asyncplatform library.
 Currently supports:
     - Studio projects
     - Operations Manager automations
-     - Lifecycle Manager resources
-
-Coming soon:
-    - Configuration Manager configurations
+    - Lifecycle Manager resources
+    - Configuration Manager golden configs
 
 Usage:
     python deploy.py <environment>
@@ -66,7 +64,8 @@ class AssetDeployer:
         assets: dict[str, list[Path]] = {
             "projects": [],
             "automations": [],
-            "lifecycle_manager_resources": []
+            "lifecycle_manager_resources": [],
+            "golden_configs": [],
         }
 
         # Scan for Studio project files by looking in studio folders
@@ -89,7 +88,14 @@ class AssetDeployer:
                 for resource_file in lm_dir.glob("*.json"):
                     assets["lifecycle_manager_resources"].append(resource_file)
                     print(f"🔧 Found Lifecycle Manager resource: {resource_file.name}")
-        
+
+        # Scan for Configuration Manager golden config files
+        for cm_dir in repo_root.glob("*/configuration_manager"):
+            if cm_dir.is_dir():
+                for config_file in cm_dir.glob("*.json"):
+                    assets["golden_configs"].append(config_file)
+                    print(f"⚙️  Found golden config: {config_file.name}")
+
         return assets
 
     async def deploy_projects(self, client: Any, project_files: list[Path]) -> None:
@@ -226,6 +232,42 @@ class AssetDeployer:
                 print(f"❌ Failed to import resource model {resource_name}: {e}")
                 raise
 
+    async def deploy_golden_configs(
+        self, client: Any, config_files: list[Path]
+    ) -> None:
+        """Deploy Configuration Manager golden configs to the platform.
+
+        Args:
+            client: Asyncplatform client instance
+            config_files: List of golden config file paths
+        """
+        if not config_files:
+            print("ℹ️  No Configuration Manager golden configs to deploy")
+            return
+
+        cm_resource = client.resource("configuration_manager")
+
+
+        for config_file in config_files:
+            with open(config_file, "r") as f:
+                config_data = json.load(f)
+            config_name = config_data.get("name",config_file.stem)
+            try:
+                # Check if golden config already exists and delete before re-importing
+                existing_config = await cm_resource.check_if_golden_config_exists(config_name)
+                if existing_config:
+                    print(f"📝 Golden config exists, deleting existing version: {config_name}")
+                    await cm_resource.delete(config_name)
+                    print(f"🗑️  Deleted existing golden config: {config_name}")
+
+                print(f"📥 Importing golden config: {config_name}")
+                result = await cm_resource.importer([config_data])
+                print(f"✅ Successfully imported golden config: {config_name}")
+            except Exception as e:
+                print(f"❌ Failed to import golden config {config_name}: {e}")
+                raise
+    
+
     async def deploy(self) -> None:
         """Execute the deployment process."""
         print(f"\n{'='*60}")
@@ -258,6 +300,8 @@ class AssetDeployer:
 
             # Deploy automations
             await self.deploy_automations(client, assets["automations"])
+
+            await self.deploy_golden_configs(client, assets["golden_configs"])
 
         print(f"\n{'='*60}")
         print(f"✅ Deployment to {self.environment} completed successfully!")
