@@ -65,7 +65,7 @@ class AssetDeployer:
             "projects": [],
             "automations": [],
             "lifecycle_manager_resources": [],
-            "configurations": [],
+            "golden_configs": [],
         }
 
         # Scan for Studio project files by looking in studio folders
@@ -93,7 +93,7 @@ class AssetDeployer:
         for cm_dir in repo_root.glob("*/configuration_manager"):
             if cm_dir.is_dir():
                 for config_file in cm_dir.glob("*.json"):
-                    assets["configurations"].append(config_file)
+                    assets["golden_configs"].append(config_file)
                     print(f"⚙️  Found golden config: {config_file.name}")
 
         return assets
@@ -232,7 +232,7 @@ class AssetDeployer:
                 print(f"❌ Failed to import resource model {resource_name}: {e}")
                 raise
 
-    async def deploy_configurations(
+    async def deploy_golden_configs(
         self, client: Any, config_files: list[Path]
     ) -> None:
         """Deploy Configuration Manager golden configs to the platform.
@@ -301,7 +301,7 @@ class AssetDeployer:
             # Deploy automations
             await self.deploy_automations(client, assets["automations"])
 
-            await self.deploy_configurations(client, assets["configurations"])
+            await self.deploy_golden_configs(client, assets["golden_configs"])
 
         print(f"\n{'='*60}")
         print(f"✅ Deployment to {self.environment} completed successfully!")
