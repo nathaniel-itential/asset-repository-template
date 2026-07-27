@@ -166,6 +166,16 @@ class AssetDeployer:
     async def deploy_agent_projects(
         self, client: Any, bundle_files: list[Path]
     ) -> None:
+        """Deploy Agent projects to the platform.
+
+        Args:
+            client: Asyncplatform client instance
+            bundle_files: List of agent project bundle file paths
+        """
+        if not bundle_files:
+            print("ℹ️  No Agent projects to deploy")
+            return
+
         agent_projects_resource = client.resource("agent_projects")
         for bundle_file in bundle_files:
             with open(bundle_file, "r") as f:
@@ -184,11 +194,12 @@ class AssetDeployer:
                         member_data["username"] = member["username"]
                     else:
                         member_data["name"] = member["name"]
-                    
+
                     members.append(ProjectMember(**member_data))
+                print(f"📥 Importing agent project: {bundle_name}")
                 await agent_projects_resource.importer(
-                    bundle_data, 
-                    members=members, 
+                    bundle_data,
+                    members=members,
                     overwrite=True
                     )
                 print(f"✅ Successfully imported Agent project: {bundle_name}")
