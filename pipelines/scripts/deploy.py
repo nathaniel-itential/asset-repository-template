@@ -10,6 +10,7 @@ Currently supports:
     - Operations Manager automations
     - Lifecycle Manager resources
     - Configuration Manager golden configs
+    - FlowAI Agent projects
 
 Usage:
     python deploy.py <environment>
@@ -66,6 +67,7 @@ class AssetDeployer:
             "automations": [],
             "lifecycle_manager_resources": [],
             "golden_configs": [],
+            "agent_projects": []
         }
 
         # Scan for Studio project files by looking in studio folders
@@ -95,6 +97,13 @@ class AssetDeployer:
                 for config_file in cm_dir.glob("*.json"):
                     assets["golden_configs"].append(config_file)
                     print(f"⚙️  Found golden config: {config_file.name}")
+
+        # Scan for Agent Project project files
+        for agent_dir in repo_root.glob("*/agent_projects"):
+            if agent_dir.is_dir():
+                for agent_project in agent_dir.glob("*.json"):
+                    assets["agent_projects"].append(agent_project)
+                    print(f"🧠 Found agent project: {agent_project.name}")
 
         return assets
 
@@ -152,7 +161,40 @@ class AssetDeployer:
                         print(f"👤 Added {member.type} {member_identifier} as {member.role}")
             except Exception as e:
                 print(f"❌ Failed to import project {project_name}: {e}")
-                raise
+                print(f"⚠️  Skipping {project_name} and continuing deployment")
+
+    async def deploy_agent_projects(
+        self, client: Any, bundle_files: list[Path]
+    ) -> None:
+        agent_projects_resource = client.resource("agent_projects")
+        for bundle_file in bundle_files:
+            with open(bundle_file, "r") as f:
+                bundle_data = json.load(f)
+            bundle_name = bundle_data.get("name", bundle_file.stem)
+            try:
+                members = []
+                for member in self.members:
+                    member_data = {
+                        "type": member["type"],
+                        "role": member["role"]
+                    }
+
+                    # Use username for accounts, name for groups
+                    if member["type"] == "account":
+                        member_data["username"] = member["username"]
+                    else:
+                        member_data["name"] = member["name"]
+                    
+                    members.append(ProjectMember(**member_data))
+                await agent_projects_resource.importer(
+                    bundle_data, 
+                    members=members, 
+                    overwrite=True
+                    )
+                print(f"✅ Successfully imported Agent project: {bundle_name}")
+            except Exception as e:
+                print(f"❌ Failed to import Agent project {bundle_name}: {e}")
+                print(f"⚠️  Skipping {bundle_name} and continuing deployment")
 
     async def deploy_automations(
         self, client: Any, automation_files: list[Path]
@@ -192,7 +234,7 @@ class AssetDeployer:
                 print(f"✅ Successfully imported automation: {result['name']}")
             except Exception as e:
                 print(f"❌ Failed to import automation {automation_name}: {e}")
-                raise
+                print(f"⚠️  Skipping {automation_name} and continuing deployment")
     
     async def deploy_lifecycle_manager_resources(
         self, client: Any, resource_files: list[Path]
@@ -230,7 +272,7 @@ class AssetDeployer:
                 print(f"✅ Successfully imported resource model: {result['data']['name']}")
             except Exception as e:
                 print(f"❌ Failed to import resource model {resource_name}: {e}")
-                raise
+                print(f"⚠️  Skipping {resource_name} and continuing deployment")
 
     async def deploy_golden_configs(
         self, client: Any, config_files: list[Path]
@@ -265,7 +307,7 @@ class AssetDeployer:
                 print(f"✅ Successfully imported golden config: {config_name}")
             except Exception as e:
                 print(f"❌ Failed to import golden config {config_name}: {e}")
-                raise
+                print(f"⚠️  Skipping {config_name} and continuing deployment")
     
 
     async def deploy(self) -> None:
@@ -297,6 +339,8 @@ class AssetDeployer:
             await self.deploy_lifecycle_manager_resources(
                 client, assets["lifecycle_manager_resources"]
             )
+
+            await self.deploy_agent_projects(client, assets["agent_projects"])
 
             # Deploy automations
             await self.deploy_automations(client, assets["automations"])

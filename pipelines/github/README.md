@@ -66,7 +66,7 @@ Create a repository-level secret for the auto-rc-tag workflow:
 
 ### 4. Configure Project Members
 
-The `PROJECT_MEMBERS` variable is a JSON array that controls who gets assigned to imported Studio projects. It supports two member types:
+The `PROJECT_MEMBERS` variable is a JSON array that controls who gets assigned to imported Studio and Agent projects. It supports two member types:
 
 ```json
 [

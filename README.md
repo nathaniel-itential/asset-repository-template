@@ -64,6 +64,7 @@ Once the version is determined, the script creates a release candidate tag (e.g.
 .
 ├── Asset Bundle/              # Example asset bundle
 │   ├── studio/
+│   ├── agent_projects/
 │   ├── operations_manager/
 │   ├── lifecycle_manager/
 │   └── configuration_manager/
@@ -88,6 +89,7 @@ An example asset bundle that shows the expected directory layout. It includes sa
 - **`operations_manager/`** — Operations Manager automation files (`.automation.json`)
 - **`lifecycle_manager/`** — Lifecycle Manager resource model files (`.model.json`)
 - **`configuration_manager/`** — Configuration Manager golden config files (`.gctree.json`)
+- **`agent_projects/`** — FlowAI Agent Project files (`.agent_project.json`)
 
 You can add multiple bundles at the repo root and the deploy script will auto-discover them.
 
@@ -97,7 +99,7 @@ Contains CI/CD pipeline definitions organized by platform, along with shared scr
 
 **`pipelines/scripts/`** — Shared scripts used across all platforms:
 
-- **`deploy.py`** — Connects to an Itential Platform instance and imports all discovered assets from the repository. Currently supports Studio projects, Operations Manager automations, Golden configurations, and Lifecycle Manager resources
+- **`deploy.py`** — Connects to an Itential Platform instance and imports all discovered assets from the repository. Currently supports Studio projects, Agent projects, Operations Manager automations, Golden configurations, and Lifecycle Manager resources
 - **`bump-version.sh`** — Calculates the next semantic version based on commit messages and creates release candidate tags
 
 **Platform-specific pipeline directories:**
@@ -123,6 +125,8 @@ See the README in each platform directory for setup and deployment instructions.
 My Use Case Bundle/
 ├── studio/
 │   └── My Project.project.json
+├── agent_projects/
+│   └── My Agent Project.project.json
 ├── operations_manager/              
 │   └── My Automation.automation.json
 ├── lifecycle_manager/               

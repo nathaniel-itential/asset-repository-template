@@ -81,7 +81,7 @@ Create a project-level CI/CD variable for the `create-rc-tag` job under **Settin
 
 > **Important:** When adding the `PROJECT_MEMBERS` variable, enable **Expand variable reference** so that the JSON value is correctly parsed at runtime.
 
-The `PROJECT_MEMBERS` variable is a JSON array that controls who gets assigned to imported Studio projects. It supports two member types. It can be shared across all environments (scope `*`) or set per-environment if staging and production require different members.
+The `PROJECT_MEMBERS` variable is a JSON array that controls who gets assigned to imported Studio and Agent projects. It supports two member types. It can be shared across all environments (scope `*`) or set per-environment if staging and production require different members.
 
 The value must be minified JSON with no whitespace:
 

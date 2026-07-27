@@ -81,7 +81,7 @@ Mark this variable as **Secured** so it is masked in logs.
 
 ### 4. Configure Project Members
 
-The `PROJECT_MEMBERS` variable is a JSON array that controls who gets assigned to imported Studio projects. It supports two member types. It can be shared across all environments or set per-environment if staging and production require different members.
+The `PROJECT_MEMBERS` variable is a JSON array that controls who gets assigned to imported Studio and Agent projects. It supports two member types. It can be shared across all environments or set per-environment if staging and production require different members.
 
 The value must be minified JSON with no whitespace:
 
